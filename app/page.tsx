@@ -1,5 +1,4 @@
 "use client";
-import next from "next";
 import { useState } from "react";
 
 export default function Home() {
@@ -26,10 +25,13 @@ export default function Home() {
   const possibleInfoChoices = [
     { english: "a teacher", irish: "múinteoir", count: Count.Singular },
     { english: "a doctor", irish: "dochtúir", count: Count.Singular },
-    { english: "a woman", irish: "bean", count: Count.Singular },
+    { english: "women", irish: "mná", count: Count.Plural },
     { english: "doctors", irish: "dochtúirí", count: Count.Plural },
     { english: "men", irish: "fir", count: Count.Plural },
     { english: "teachers", irish: "múinteoirí", count: Count.Plural },
+    { english: "a librarian", irish: "leabharlannaí", count: Count.Singular },
+    { english: "a person", irish: "duine", count: Count.Singular },
+    { english: "scientists", irish: "eolaithe", count: Count.Plural },
   ];
 
   enum ExerciseResult {
@@ -47,21 +49,21 @@ export default function Home() {
   const [result, setResult] = useState(ExerciseResult.None);
 
   function chooseInfo(info: TranslationPair) {
+    setResult(ExerciseResult.None);
     if (info.irish == chosenInfo.irish) {
       setChosenInfo(emptyChoice);
       return;
     }
     setChosenInfo(info);
-    setResult(ExerciseResult.None);
   }
 
   function chooseSubject(subject: TranslationPair) {
+    setResult(ExerciseResult.None);
     if (subject.irish == chosenSubject.irish) {
       setChosenSubject(emptyChoice);
       return;
     }
     setChosenSubject(subject);
-    setResult(ExerciseResult.None);
   }
 
   function conjugateToBe(subject: string) {
@@ -113,16 +115,20 @@ export default function Home() {
 
   function CheckButton(props: { result: ExerciseResult }) {
     let result = props.result;
-    let color = "gray-200";
+    let border = "border-gray-200";
+    let text = "text-gray-200";
+
     if (result == ExerciseResult.Correct) {
-      color = "green-400";
+      border = "border-green-400";
+      text = "text-green-400";
     } else if (result == ExerciseResult.Incorrect) {
-      color = "red-400";
+      border = "border-red-400";
+      text = "text-red-400";
     }
 
     return (
       <button
-        className={`border-2 border-${color} text-${color} p-2`}
+        className={`border-2 ${border} ${text} p-2`}
         onClick={result == ExerciseResult.Correct ? goNext : checkAnswer}
       >
         {result == ExerciseResult.Correct ? (
@@ -176,17 +182,17 @@ export default function Home() {
 
         {/* Input Table */}
         <div className="flex">
-          <div className="flex flex-wrap gap-2 max-w-50">
+          <div className="flex flex-wrap gap-2 max-w-50 items-start content-start">
             {possibleSubjectChoices.map((subject) => (
               <button
-                className="p-2 border-2 border-blue-400 items-center align-center justify-center text-center"
+                className="p-2 border-2 border-blue-400 text-center max-h-15"
                 onClick={() => chooseSubject(subject)}
               >
                 {subject.english}
               </button>
             ))}
           </div>
-          <div className="flex flex-wrap gap-2 max-w-50">
+          <div className="flex flex-wrap gap-2 max-w-70">
             {possibleInfoChoices.map((info) => (
               <button
                 className="p-2 border-2 border-yellow-400"
