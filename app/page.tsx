@@ -148,7 +148,7 @@ export default function Home() {
     );
   }
 
-  function TargetSentence({ irish }) {
+  function TargetSentence({ irish }: { irish: boolean }) {
     return (
       <div className="flex gap-3 text-3xl">
         {irish && <div> Is </div>}
@@ -179,7 +179,7 @@ export default function Home() {
     );
   }
 
-  function AnswerArea({ irish }) {
+  function AnswerArea({ irish }: { irish: boolean }) {
     if (irish) {
       return (
         <div className="flex gap-3 text-3xl">
@@ -228,7 +228,7 @@ export default function Home() {
     Subject,
   }
 
-  function InputTable({ irish, type }) {
+  function InputTable({ irish, type }: { irish: boolean; type: InputType }) {
     let list = possibleSubjectChoices;
     let choose = chooseSubject;
     if (type == InputType.Information) {
