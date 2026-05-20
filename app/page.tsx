@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 export default function Home() {
   enum Count {
@@ -48,6 +49,12 @@ export default function Home() {
   const [chosenInfo, setChosenInfo] = useState(emptyChoice);
   const [result, setResult] = useState(ExerciseResult.None);
 
+  const [irishToEnglish, setIrishToEnglish] = useState(true);
+
+  function chooseRandom(list: any[]) {
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
   function chooseInfo(info: TranslationPair) {
     setResult(ExerciseResult.None);
     if (info.irish == chosenInfo.irish) {
@@ -91,6 +98,11 @@ export default function Home() {
     }
   }
 
+  function switchLanguages() {
+    goNext();
+    setIrishToEnglish((current) => !current);
+  }
+
   function goNext() {
     let subject = realSubject;
     let info = realInfo;
@@ -98,12 +110,8 @@ export default function Home() {
       subject.count != info.count ||
       (subject == realSubject && info == realInfo)
     ) {
-      const nextSubject = Math.floor(
-        Math.random() * possibleSubjectChoices.length,
-      );
-      const nextInfo = Math.floor(Math.random() * possibleInfoChoices.length);
-      subject = possibleSubjectChoices[nextSubject];
-      info = possibleInfoChoices[nextInfo];
+      subject = chooseRandom(possibleSubjectChoices);
+      info = chooseRandom(possibleInfoChoices);
     }
 
     setRealSubject(subject);
@@ -140,27 +148,60 @@ export default function Home() {
     );
   }
 
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex gap-10 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        {/* Irish */}
-        <div className="flex gap-3 text-3xl">
-          <div> Is </div>
+  function TargetSentence({ irish }) {
+    return (
+      <div className="flex gap-3 text-3xl">
+        {irish && <div> Is </div>}
+        {irish && (
           <div className="flex-col">
             <div className="underline decoration-yellow-400">
               {realInfo.irish}
             </div>
             <div className="text-xs text-yellow-400">information</div>
           </div>
+        )}
+        <div>
+          <div className="underline decoration-blue-400">
+            {irish ? realSubject.irish : realSubject.english}
+          </div>
+          <div className="text-xs text-blue-400">subject</div>
+        </div>
+        {!irish && <div> {conjugateToBe(realSubject.english)} </div>}
+        {!irish && (
+          <div className="flex-col">
+            <div className="underline decoration-yellow-400">
+              {realInfo.english}
+            </div>
+            <div className="text-xs text-yellow-400">information</div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  function AnswerArea({ irish }) {
+    if (irish) {
+      return (
+        <div className="flex gap-3 text-3xl">
+          <div>Is</div>
+
+          <div className="flex-col">
+            <div className="border-2 border-yellow-400 border-solid min-w-20 min-h-10 p-1">
+              {chosenInfo.irish}
+            </div>
+            <div className="text-xs text-yellow-400">information</div>
+          </div>
+
           <div>
-            <div className="underline decoration-blue-400">
-              {realSubject.irish}
+            <div className="border-2 border-blue-400 border-solid min-w-20 min-h-10 p-1">
+              {chosenSubject.irish}
             </div>
             <div className="text-xs text-blue-400">subject</div>
           </div>
         </div>
-
-        {/* Answer Area */}
+      );
+    } else {
+      return (
         <div className="flex gap-3 text-3xl">
           <div>
             <div className="border-2 border-blue-400 border-solid min-w-20 min-h-10 p-1">
@@ -169,8 +210,7 @@ export default function Home() {
             <div className="text-xs text-blue-400">subject</div>
           </div>
           <div className="text-gray-400 p-1">
-            {" "}
-            {conjugateToBe(chosenSubject.english)}{" "}
+            {conjugateToBe(chosenSubject.english)}
           </div>
           <div className="flex-col">
             <div className="border-2 border-yellow-400 border-solid min-w-20 min-h-10 p-1">
@@ -179,33 +219,54 @@ export default function Home() {
             <div className="text-xs text-yellow-400">information</div>
           </div>
         </div>
+      );
+    }
+  }
+
+  enum InputType {
+    Information,
+    Subject,
+  }
+
+  function InputTable({ irish, type }) {
+    let list = possibleSubjectChoices;
+    let choose = chooseSubject;
+    if (type == InputType.Information) {
+      list = possibleInfoChoices;
+      choose = chooseInfo;
+    }
+
+    return (
+      <div className="flex flex-wrap gap-2 max-w-50 items-start content-start">
+        {list.map((word) => (
+          <button
+            className={`p-2 border-2 ${type == InputType.Subject ? "border-blue-400" : "border-yellow-400"} text-center max-h-15`}
+            onClick={() => choose(word)}
+          >
+            {irish ? word.irish : word.english}
+          </button>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+      <main className="flex gap-10 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+        <TargetSentence irish={irishToEnglish} />
+        <AnswerArea irish={!irishToEnglish} />
 
         {/* Input Table */}
-        <div className="flex">
-          <div className="flex flex-wrap gap-2 max-w-50 items-start content-start">
-            {possibleSubjectChoices.map((subject) => (
-              <button
-                className="p-2 border-2 border-blue-400 text-center max-h-15"
-                onClick={() => chooseSubject(subject)}
-              >
-                {subject.english}
-              </button>
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-2 max-w-70">
-            {possibleInfoChoices.map((info) => (
-              <button
-                className="p-2 border-2 border-yellow-400"
-                onClick={() => chooseInfo(info)}
-              >
-                {info.english}
-              </button>
-            ))}
-          </div>
+        <div className={`flex ${!irishToEnglish && "flex-row-reverse"}`}>
+          <InputTable type={InputType.Subject} irish={!irishToEnglish} />
+          <InputTable type={InputType.Information} irish={!irishToEnglish} />
         </div>
 
-        <div className="flex flex-row-reverse w-full">
+        <div className="flex flex-row-reverse w-full gap-10">
           <CheckButton result={result} />
+          <button className="p-2" onClick={switchLanguages}>
+            Change Translation Direction (For Testing)
+          </button>
         </div>
       </main>
     </div>
