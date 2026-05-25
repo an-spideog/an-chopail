@@ -38,7 +38,7 @@ export default function TargetSentence({
         </div>
         <div className="text-xs text-blue-400">subject</div>
       </div>
-      {!irish && <div> {conjugateToBe(realSubject.english)} </div>}
+      {!irish && <div> {conjugateToBe(realSubject)} </div>}
       {!irish && (
         <div className="flex-col">
           <div className="underline decoration-yellow-400">
