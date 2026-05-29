@@ -10,6 +10,10 @@ export function conjugateToBe(subject: Noun) {
     return "am";
   }
 
+  if (eng == "you") {
+    return "are";
+  }
+
   if (subject.count == Count.Plural) {
     return "are";
   }

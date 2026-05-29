@@ -6,6 +6,7 @@ type Props = {
   chosenInfo: Noun;
   chosenSubject: Noun;
   nounSubject: boolean;
+  chosenSubSubject: Noun;
 };
 
 export default function AnswerArea({
@@ -13,7 +14,9 @@ export default function AnswerArea({
   chosenInfo,
   chosenSubject,
   nounSubject,
+  chosenSubSubject,
 }: Props) {
+  const showSubSub = irish && nounSubject;
   if (irish) {
     return (
       <div className="flex gap-3 text-3xl">
@@ -25,6 +28,15 @@ export default function AnswerArea({
           </div>
           <div className="text-xs text-yellow-400">information</div>
         </div>
+
+        {showSubSub && (
+          <div className="flex-col">
+            <div className="border-2 border-blue-300 border-solid min-w-20 min-h-10 p-1">
+              {chosenSubSubject.irish}
+            </div>
+            <div className="text-xs text-blue-300">sub-subject</div>
+          </div>
+        )}
 
         <div>
           <div className="border-2 border-blue-400 border-solid min-w-20 min-h-10 p-1">

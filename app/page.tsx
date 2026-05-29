@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CheckButton from "./components/CheckButton";
 import InputTable from "./components/InputTable";
 import { chooseRandom } from "./util";
@@ -10,6 +10,7 @@ import {
   nounSubjectChoices,
   possibleInfoChoices,
   possibleSubjectChoices,
+  possibleSubsubs,
 } from "./words";
 
 export default function Home() {
@@ -26,15 +27,22 @@ export default function Home() {
     gender: Gender.Masculine,
   };
 
-  const [realSubject, setRealSubject] = useState(possibleSubjectChoices[0]);
-  const [realInfo, setRealInfo] = useState(possibleInfoChoices[0]);
+  const [realSubject, setRealSubject] = useState(emptyChoice);
+  const [realInfo, setRealInfo] = useState(emptyChoice);
   const [chosenSubject, setChosenSubject] = useState(emptyChoice);
   const [chosenInfo, setChosenInfo] = useState(emptyChoice);
   const [result, setResult] = useState(ExerciseResult.None);
+  const [chosenSubsub, setChosenSubsub] = useState(emptyChoice);
 
   // Testing options
   const [irishToEnglish, setIrishToEnglish] = useState(true);
   const [nounSubjects, setNounSubjects] = useState(false);
+
+  const showSubsubTable = !irishToEnglish && nounSubjects;
+
+  useEffect(() => {
+    goNext();
+  }, []);
 
   function chooseInfo(info: Noun) {
     setResult(ExerciseResult.None);
@@ -54,15 +62,23 @@ export default function Home() {
     setChosenSubject(subject);
   }
 
+  function chooseSubsub(subsub: Noun) {
+    setResult(ExerciseResult.None);
+    if (subsub.irish == chosenSubsub.irish) {
+      setChosenSubsub(emptyChoice);
+      return;
+    }
+
+    setChosenSubsub(subsub);
+  }
+
   function checkAnswer() {
     const correct =
       realSubject.irish === chosenSubject.irish &&
       realInfo.irish === chosenInfo.irish;
     if (correct) {
-      console.log("answer correct");
       setResult(ExerciseResult.Correct);
     } else {
-      console.log("answer incorrect");
       setResult(ExerciseResult.Incorrect);
     }
   }
@@ -79,12 +95,11 @@ export default function Home() {
     });
   }
 
-  function goNext(nounSubjects: boolean = false) {
+  function goNext(ns: boolean = nounSubjects) {
+    console.log("ns: ", ns);
     let subject = realSubject;
     let info = realInfo;
-    const subjectList = nounSubjects
-      ? nounSubjectChoices
-      : possibleSubjectChoices;
+    const subjectList = ns ? nounSubjectChoices : possibleSubjectChoices;
     while (
       subject.count != info.count ||
       (subject == realSubject && info == realInfo)
@@ -98,6 +113,27 @@ export default function Home() {
     setResult(ExerciseResult.None);
     setChosenInfo(emptyChoice);
     setChosenSubject(emptyChoice);
+    setChosenSubsub(emptyChoice);
+  }
+
+  function goToLevel(level: number) {
+    if (level == 1) {
+      setIrishToEnglish(true);
+      setNounSubjects(false);
+      goNext(false);
+    } else if (level == 2) {
+      setIrishToEnglish(false);
+      setNounSubjects(false);
+      goNext(false);
+    } else if (level == 3) {
+      setIrishToEnglish(true);
+      setNounSubjects(true);
+      goNext(true);
+    } else if (level == 4) {
+      setIrishToEnglish(false);
+      setNounSubjects(true);
+      goNext(true);
+    }
   }
 
   return (
@@ -109,21 +145,31 @@ export default function Home() {
           realSubject={realSubject}
           nounSubject={nounSubjects}
         />
+
         <AnswerArea
           irish={!irishToEnglish}
           chosenInfo={chosenInfo}
           chosenSubject={chosenSubject}
           nounSubject={nounSubjects}
+          chosenSubSubject={chosenSubsub}
         />
 
         {/* Input Table */}
-        <div className={`flex ${!irishToEnglish && "flex-row-reverse"}`}>
+        <div className={`flex ${!irishToEnglish && "flex-row-reverse"} gap-3`}>
           <InputTable
             irish={!irishToEnglish}
             list={nounSubjects ? nounSubjectChoices : possibleSubjectChoices}
             onClick={chooseSubject}
             color="border-blue-400"
           />
+          {showSubsubTable && (
+            <InputTable
+              irish={!irishToEnglish}
+              list={possibleSubsubs}
+              onClick={chooseSubsub}
+              color="border-blue-300"
+            />
+          )}
           <InputTable
             irish={!irishToEnglish}
             list={possibleInfoChoices}
@@ -135,15 +181,15 @@ export default function Home() {
         <div className="flex flex-row-reverse w-full gap-10">
           <CheckButton
             result={result}
-            goNext={goNext}
+            goNext={() => goNext()}
             checkAnswer={checkAnswer}
           />
-          <button className="p-2" onClick={switchLanguages}>
-            Change Translation Direction
-          </button>
-          <button className="p-2" onClick={changeDefinite}>
-            Change definite
-          </button>
+        </div>
+        <div className="flex flex-row w-full gap-10">
+          <button onClick={() => goToLevel(1)}>Lvl 1</button>
+          <button onClick={() => goToLevel(2)}>Lvl 2</button>
+          <button onClick={() => goToLevel(3)}>Lvl 3</button>
+          <button onClick={() => goToLevel(4)}>Lvl 4</button>
         </div>
       </main>
     </div>

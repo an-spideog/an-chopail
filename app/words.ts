@@ -1,4 +1,3 @@
-import { generateKey } from "crypto";
 import { Count, Gender, Noun } from "./noun";
 
 export const possibleSubjectChoices: Noun[] = [
@@ -45,10 +44,10 @@ export const possibleInfoChoices: Noun[] = [
     gender: Gender.Masculine,
   },
   {
-    english: "women",
-    irish: "mná",
+    english: "soldiers",
+    irish: "saighdiúirí",
     count: Count.Plural,
-    gender: Gender.Feminine,
+    gender: Gender.Masculine,
   },
   {
     english: "doctors",
@@ -57,8 +56,8 @@ export const possibleInfoChoices: Noun[] = [
     gender: Gender.Masculine,
   },
   {
-    english: "men",
-    irish: "fir",
+    english: "chefs",
+    irish: "cócairí",
     count: Count.Plural,
     gender: Gender.Masculine,
   },
@@ -75,8 +74,8 @@ export const possibleInfoChoices: Noun[] = [
     gender: Gender.Masculine,
   },
   {
-    english: "a person",
-    irish: "duine",
+    english: "a guard",
+    irish: "garda",
     count: Count.Singular,
     gender: Gender.Masculine,
   },
@@ -137,4 +136,20 @@ export const nounSubjectChoices: Noun[] = [
     count: Count.Plural,
     gender: Gender.Masculine,
   },
+];
+
+export const possibleSubsubs: Noun[] = [
+  {
+    english: "he",
+    irish: "é",
+    count: Count.Singular,
+    gender: Gender.Masculine,
+  },
+  {
+    english: "she",
+    irish: "í",
+    count: Count.Singular,
+    gender: Gender.Feminine,
+  },
+  { english: "they", irish: "iad", count: Count.Plural, gender: Gender.None },
 ];
